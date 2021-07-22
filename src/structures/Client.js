@@ -390,6 +390,10 @@ class Client extends EventEmitter {
     await this.ig.account.logout();
   }
 
+  sessionChanged(callback) {
+    this.sessionChangedCallback = callback;
+  }
+
   /**
    * Log the bot in to Instagram
    * @param {string} username The username of the Instagram account.
@@ -398,10 +402,19 @@ class Client extends EventEmitter {
    */
   async login(username, password, state) {
     const ig = withFbns(withRealtime(new IgApiClient()));
+
+    ig.request.end$.subscribe(async () => {
+      const serialized = await ig.state.serialize();
+      delete serialized.constants; // this deletes the version info, so you'll always use the version provided by the library
+      this.sessionChangedCallback(serialized);
+    });
+
     ig.state.generateDevice(username);
+
     if (state) {
-      await ig.importState(state);
+      await ig.state.deserialize(state);
     }
+
     await ig.simulate.preLoginFlow();
 
     try {
