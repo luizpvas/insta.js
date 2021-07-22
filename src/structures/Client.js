@@ -402,6 +402,7 @@ class Client extends EventEmitter {
    */
   async login(username, password, state) {
     const ig = withFbns(withRealtime(new IgApiClient()));
+    this.ig = ig;
 
     ig.request.end$.subscribe(async () => {
       const serialized = await ig.state.serialize();
@@ -425,13 +426,13 @@ class Client extends EventEmitter {
       return { status: "ok" };
     } catch (err) {
       console.log("login failed");
+      console.log(err);
 
       if (err instanceof IgLoginTwoFactorRequiredErrorIgTw) {
         console.log("two factor authentication enabled on the account.");
 
         const { username, totp_two_factor_on, two_factor_identifier } =
           err.response.body.two_factor_info;
-        this.ig = ig;
         this.username = username;
         this.totp_two_factor_on = totp_two_factor_on;
         this.two_factor_identifier = two_factor_identifier;
