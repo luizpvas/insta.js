@@ -459,7 +459,7 @@ class Client extends EventEmitter {
     this.postLogin(this.ig, response);
   }
 
-  postLogin(ig, response) {
+  async postLogin(ig, response) {
     console.log(response);
 
     const userData = await ig.user.info(response.pk);
