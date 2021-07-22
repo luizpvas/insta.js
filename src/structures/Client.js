@@ -426,9 +426,9 @@ class Client extends EventEmitter {
       return { status: "ok" };
     } catch (err) {
       console.log("login failed");
-      console.log(err);
+      console.log(err.toString());
 
-      if (err instanceof IgLoginTwoFactorRequiredErrorIgTw) {
+      if (err.toString().indexOf("IgLoginTwoFactorRequiredError") !== -1) {
         console.log("two factor authentication enabled on the account.");
 
         const { username, totp_two_factor_on, two_factor_identifier } =
@@ -448,6 +448,14 @@ class Client extends EventEmitter {
 
   async verificationCode(verificationCode) {
     console.log("trying to verify two factor authentication code");
+
+    console.log({
+      username: this.username,
+      verificationCode,
+      twoFactorIdentifier: this.two_factor_identifier,
+      verificationMethod: this.totp_two_factor_on ? "0" : "1", // '1' = SMS (default), '0' = TOTP (google auth for example)
+      trustThisDevice: "1", // Can be omitted as '1' is used by default
+    });
 
     let response = await this.ig.account.twoFactorLogin({
       username: this.username,
