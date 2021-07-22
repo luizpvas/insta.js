@@ -405,7 +405,7 @@ class Client extends EventEmitter {
 
     ig.request.end$.subscribe(async () => {
       const serialized = await ig.state.serialize();
-      delete serialized.constants; // this deletes the version info, so you'll always use the version provided by the library
+      delete serialized.constants;
       this.sessionChangedCallback(serialized);
     });
 
@@ -445,7 +445,7 @@ class Client extends EventEmitter {
     }
   }
 
-  verificationCode(verificationCode) {
+  async verificationCode(verificationCode) {
     console.log("trying to verify two factor authentication code");
 
     let response = await this.ig.account.twoFactorLogin({
