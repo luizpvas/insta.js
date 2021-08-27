@@ -388,6 +388,8 @@ class Client extends EventEmitter {
    */
   async logout() {
     await this.ig.account.logout();
+    await this.ig.realtime.disconnect();
+    await this.ig.fbns.disconnect();
   }
 
   sessionChanged(callback) {
